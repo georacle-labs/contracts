@@ -12,6 +12,9 @@ const {
 module.exports = {
   defaultNetwork: 'localhost',
   networks: {
+    localhost: {
+      chainID: 1337,
+    },
     mainnet: {
       url: ETH_URL,
       accounts: [`${PRIVATE_KEY}`],

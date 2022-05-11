@@ -7,8 +7,8 @@ contract Providers {
     using UnorderedSet for UnorderedSet.Set;
     UnorderedSet.Set oracles;
 
-    event ProviderJoin(address p);
-    event ProviderExit(address p);
+    event ProviderJoin(address indexed p, bytes indexed pubkey, bytes32 indexed netAddr);
+    event ProviderExit(address indexed p);
 
     /* @notice Join the provider network
      * @param pubkey the node's public key
@@ -16,7 +16,7 @@ contract Providers {
      */
     function join(bytes memory pubkey, bytes32 netAddr) public {
         oracles.add(msg.sender, pubkey, netAddr);
-        emit ProviderJoin(msg.sender);
+        emit ProviderJoin(msg.sender, pubkey, netAddr);
     }
 
     /* @notice Exit the provider network
