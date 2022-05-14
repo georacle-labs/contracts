@@ -7,14 +7,23 @@ contract Providers {
     using UnorderedSet for UnorderedSet.Set;
     UnorderedSet.Set oracles;
 
-    event ProviderJoin(address indexed p, bytes indexed pubkey, bytes32 indexed netAddr);
+    event ProviderJoin(
+        address indexed p,
+        bytes32 indexed pubkey,
+        bytes32 indexed netAddr
+    );
     event ProviderExit(address indexed p);
+
+    modifier ValidPubkey(bytes32 pubkey) {
+        require(uint256(pubkey) != 0, "Invalid public key");
+        _;
+    }
 
     /* @notice Join the provider network
      * @param pubkey the node's public key
      * @param netAddr the associated network address
      */
-    function join(bytes memory pubkey, bytes32 netAddr) public {
+    function join(bytes32 pubkey, bytes32 netAddr) public ValidPubkey(pubkey) {
         oracles.add(msg.sender, pubkey, netAddr);
         emit ProviderJoin(msg.sender, pubkey, netAddr);
     }

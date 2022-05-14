@@ -1,5 +1,4 @@
 const { assert, expect } = require('chai');
-const { generateKeyPairSync } = require('crypto');
 const { ethers, getNamedAccounts } = require('hardhat');
 
 const hexEncode = (x) => `${x.split('').map((i) => i.charCodeAt(0).toString(16).padStart(2, '0')).join('')}`;
@@ -11,12 +10,11 @@ describe('Providers', async () => {
 
   before(async () => {
     Providers = await ethers.getContract('Providers');
-    const { publicKey } = await generateKeyPairSync('ed25519');
-    pub = `0x${publicKey.export({ type: 'spki', format: 'der' }).toString('hex')}`;
+    pub = `0x${'42'.repeat(32)}`;
     netAddr = `0x${hexEncode('0.0.0.0:9000').padEnd(64, '0')}`;
   });
 
-  describe('Provider Join', async () => {
+  describe('Provider Join', () => {
     it('Provider join should be valid', async () => {
       const providerJoinTx = await Providers.join(pub, netAddr);
       await providerJoinTx.wait();
@@ -33,17 +31,22 @@ describe('Providers', async () => {
     it('Subsequent join should revert', async () => {
       await expect(Providers.join(pub, netAddr)).to.be.revertedWith('Duplicate element');
     });
+
+    it('Invalid pubkey should revert', async () => {
+      const nullKey = `0x${'00'.repeat(32)}`;
+      await expect(Providers.join(nullKey, netAddr)).to.be.revertedWith('Invalid public key');
+    });
   });
 
-  describe('Provider Exit', async () => {
+  describe('Provider Exit', () => {
     it('Provider exit should be valid', async () => {
+      const { deployer } = await getNamedAccounts();
+
       const providerExitTx = await Providers.exit();
       await providerExitTx.wait();
 
-      const { deployer } = await getNamedAccounts();
-
       const provider = await Providers.lookup(deployer);
-      assert(provider.pubkey.length - 2 === 0);
+      assert(Number(provider.pubkey) === 0);
 
       const providers = await Providers.getProviders();
       assert(providers.length === 0);

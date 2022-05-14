@@ -25,11 +25,14 @@ library UnorderedSet {
     function add(
         Set storage s,
         address a,
-        bytes memory pubkey,
+        bytes32 pubkey,
         bytes32 netAddr
     ) internal {
         // revert on duplicate insert
-        require(s.elements[a].element.pubkey.length == 0, "Duplicate element");
+        require(
+            uint256(s.elements[a].element.pubkey) == 0,
+            "Duplicate element"
+        );
 
         // insert new element
         s.elements[a] = Element(s.keys.length, Provider.Node(pubkey, netAddr));
@@ -45,7 +48,7 @@ library UnorderedSet {
 
         // revert on nonexistent element
         require(
-            e.element.pubkey.length != 0 && e.index < s.keys.length,
+            uint256(e.element.pubkey) != 0 && e.index < s.keys.length,
             "Nonexistent element"
         );
 
