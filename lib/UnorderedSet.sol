@@ -42,8 +42,12 @@ library UnorderedSet {
     /* @notice Remove an element from the set
      * @param s the unordered set
      * @param a the address to remove
+     * @return p the removed element
      */
-    function remove(Set storage s, address a) internal {
+    function remove(Set storage s, address a)
+        internal
+        returns (Provider.Node memory p)
+    {
         Element memory e = s.elements[a];
 
         // revert on nonexistent element
@@ -54,6 +58,8 @@ library UnorderedSet {
 
         swap(s, e.index, s.keys.length - 1);
         s.keys.pop();
+
+        p = e.element;
         delete s.elements[a];
     }
 

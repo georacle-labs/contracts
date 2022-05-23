@@ -12,7 +12,12 @@ contract Providers {
         bytes32 indexed pubkey,
         bytes32 indexed netAddr
     );
-    event ProviderExit(address indexed p);
+
+    event ProviderExit(
+        address indexed p,
+        bytes32 indexed pubkey,
+        bytes32 indexed netAddr
+    );
 
     modifier ValidPubkey(bytes32 pubkey) {
         require(uint256(pubkey) != 0, "Invalid public key");
@@ -31,8 +36,8 @@ contract Providers {
     /* @notice Exit the provider network
      */
     function exit() public {
-        oracles.remove(msg.sender);
-        emit ProviderExit(msg.sender);
+        Provider.Node memory p = oracles.remove(msg.sender);
+        emit ProviderExit(msg.sender, p.pubkey, p.netAddr);
     }
 
     /* @notice Lookup a provider by address
